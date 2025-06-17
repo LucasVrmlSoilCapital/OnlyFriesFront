@@ -1,23 +1,44 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getIsMainUser } from "../utils/isMainUser";
+import { getSessionInfos } from "../utils/isMainUser";
 import { MainUserSessionDetails } from "../components/MainUserSessionDetails";
 import { SepaQr } from "../components/SepaQr";
 import { motion } from "framer-motion";
 
 export const Confirmation = (userId: any) => {
   const [isMainUser, setIsMainUser] = useState<boolean>(false);
+  const [iban, setIban] = useState<string>(""); 
+  const [email, setEmail] = useState<string>("");
+  const [amount, setAmount] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const { sessionCode } = useParams();
 
   useEffect(() => {
     const callGetIsMainUser = async () => {
-      const data = await getIsMainUser(userId.userId, sessionCode as string);
-      console.log("data", data);
-      setIsMainUser(data.data.ok);
+      try {
+        setIsLoading(true);
+        const data = await getSessionInfos(userId.userId, sessionCode as string);
+        setIsMainUser(data.data.owner_id === userId.userId);
+        setIban(data.data.iban);
+        setEmail(data.data.owner_email);
+        setAmount(data.data.price_to_pay);
+      } catch (error) {
+        console.error("Erreur lors du chargement des données:", error);
+      } finally {
+        setIsLoading(false);
+      }
     };
     callGetIsMainUser();
   }, [userId.userId, sessionCode]);
+
+  if (isLoading) {
+    return (
+      <div className="bg-[#FFEDCD] min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-amber-950"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[#FFEDCD] min-h-screen flex items-center justify-center py-20 px-4">
@@ -80,9 +101,9 @@ export const Confirmation = (userId: any) => {
               </h2>
               <div className="bg-[#FFEDCD] p-6 rounded-xl shadow-md">
                 <SepaQr
-                  iban="BE76363066256595"
-                  name="ACME SA"
-                  amount={1}
+                  iban={iban}
+                  name={email}
+                  amount={amount}
                   className="mx-auto mb-4"
                 />
                 <p className="text-amber-950/80 text-sm">
