@@ -10,7 +10,6 @@ export const Start = (userId: any) => {
   const navigate = useNavigate();
 
   const handleCreateSession = async () => {
-    // Logic to create a new session
     const user = await getUser();
     if (!user.data.user?.id) {
       throw new Error("User ID is undefined");
@@ -18,8 +17,7 @@ export const Start = (userId: any) => {
     const session = await createSession(user.data.user.id, iban);
 
     if (session.data.code) {
-      navigate(`/${session.data.code}`); // Redirect to the session page
-      // Redirect to the menu page or handle session creation success
+      navigate(`/${session.data.code}`);
     } else {
       alert("Erreur lors de la création de la session.");
     }
@@ -33,16 +31,15 @@ export const Start = (userId: any) => {
 
     console.log("userId", userId);
     const { data } = await joinSession(sessionCode, userId.userId);
-
     if (data) {
-      navigate(`/${sessionCode}`); // Redirect to the session page
+      navigate(`/${sessionCode}`);
     } else {
       alert("Erreur lors de la connexion à la session.");
     }
   };
 
   return (
-    <div>
+    <div className="p-20">
       <div>
         <input
           id="iban"
