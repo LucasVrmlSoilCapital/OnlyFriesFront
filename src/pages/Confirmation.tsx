@@ -88,7 +88,7 @@ export const Confirmation = (userId: any) => {
             transition={{ duration: 0.5, delay: 1 }}
             className="mt-8"
           >
-            <MainUserSessionDetails />
+            <MainUserSessionDetails userId={userId.userId} />
           </motion.div>
         )}
         {!isMainUser && (

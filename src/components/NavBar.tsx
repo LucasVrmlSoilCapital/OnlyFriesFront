@@ -48,9 +48,10 @@ export const NavBar = () => {
       )}
       <img
         src="/user.png"
-        className="w-12 cursor-pointer rounded-full ml-auto p-1"
+        className="w-16 h-16 cursor-pointer rounded-full overflow-hidden ml-auto p-1"
         alt="user icon"
-        onClick={() => setShowProfile(!showProfile)}
+        onMouseEnter={() => setShowProfile(true)}
+        onMouseLeave={() => setShowProfile(false)}
       />
       {showProfile && <UserProfile />}
     </header>
