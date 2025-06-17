@@ -54,7 +54,10 @@ function App() {
           <Routes>
             <Route path="/" element={<Start userId={user.id} />} />
             <Route path="/:sessionCode" element={<Order user={user} />} />
-            <Route path="/confirmation" element={<Confirmation />} />
+            <Route
+              path="/:sessionCode/confirmation"
+              element={<Confirmation userId={user.id} />}
+            />
             <Route path="*" element={<NotFound />} />
             <Route path="/:sessionCode/refund" element={<Refund />} />
           </Routes>
