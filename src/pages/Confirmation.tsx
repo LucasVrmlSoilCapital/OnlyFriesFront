@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getIsMainUser } from "../utils/isMainUser";
 import { MainUserSessionDetails } from "../components/MainUserSessionDetails";
+import { SepaQr } from "../components/SepaQr";
+import { motion } from "framer-motion";
 
 export const Confirmation = (userId: any) => {
   const [isMainUser, setIsMainUser] = useState<boolean>(false);
@@ -18,31 +20,72 @@ export const Confirmation = (userId: any) => {
   }, [userId.userId, sessionCode]);
 
   return (
-    <div className="bg-[#FFEDCD] flex items-center justify-center pt-20 h-[100vh] pb-10">
-      <div className="w-full max-w-2xl space-y-8 px-4">
-        <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-200 text-center">
-          <img
-            src="hug-fries.png"
-            className="w-72 mx-auto mb-8"
-            alt="fries hugging itself"
-          />
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <h1 className="text-2xl font-semibold text-gray-900 mb-4">Commande ajoutée !</h1>
-          <p className="text-gray-600 mb-2">Merci d'avoir commandé sur OnlyFries 😏</p>
-          <p className="text-gray-600">
+    <div className="bg-[#FFEDCD] min-h-screen flex items-center justify-center py-20 px-4">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-2xl space-y-8 bg-[#FFE4B5] rounded-2xl shadow-xl p-8"
+      >
+        <motion.img
+          initial={{ scale: 0.8 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          src="../hug-fries.png"
+          className="w-64 mx-auto mb-8 hover:scale-105 transition-transform duration-300"
+          alt="fries hugging itself"
+        />
+        <motion.h1 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.6 }}
+          className="text-3xl font-bold text-amber-950 mb-4"
+        >
+          Commande ajoutée !
+        </motion.h1>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.8 }}
+          className="space-y-4"
+        >
+          <p className="text-lg text-amber-950 mb-2">Merci d'avoir commandé sur OnlyFries 😏</p>
+          <p className="text-amber-950/80">
             La commande sera envoyée une fois que l'admin aura finalisé la commande groupée.
           </p>
-          {isMainUser && (
-            <div className="mt-8">
-              <MainUserSessionDetails />
+        </motion.div>
+        {isMainUser && (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 1 }}
+            className="mt-8"
+          >
+            <MainUserSessionDetails />
+          </motion.div>
+        )}
+        {!isMainUser && (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 1 }}
+            className="mt-8"
+          >
+            <div className="border-t border-amber-200 pt-6">
+              <h2 className="text-xl font-semibold mb-6 text-amber-950">Votre remboursement</h2>
+              <div className="bg-[#FFEDCD] p-6 rounded-xl shadow-md">
+                <SepaQr
+                  iban="BE76363066256595"
+                  name="ACME SA"
+                  amount={1}
+                  className="mx-auto mb-4"
+                />
+                <p className="text-amber-950/80 text-sm">Scannez ce QR Code avec votre app bancaire pour initier le virement.</p>
+              </div>
             </div>
-          )}
-        </div>
-      </div>
+          </motion.div>
+        )}
+      </motion.div>
     </div>
   );
 };

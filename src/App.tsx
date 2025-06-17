@@ -8,7 +8,6 @@ import { Route, Routes } from "react-router-dom";
 import Auth from "./components/Auth";
 import { getUser } from "./utils/getUser";
 import { Start } from "./components/Start";
-import Refund from "./components/Refund";
 import { Confirmation } from "./pages/Confirmation";
 import { NotFound } from "./pages/NotFound";
 
@@ -59,7 +58,6 @@ function App() {
               element={<Confirmation userId={user.id} />}
             />
             <Route path="*" element={<NotFound />} />
-            <Route path="/:sessionCode/refund" element={<Refund />} />
           </Routes>
         </ProtectedRoute>
       </div>
