@@ -2,19 +2,20 @@ import React from "react";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import "./App.css";
-import { Menu } from "./components/Menu";
 import { NavBar } from "./components/NavBar";
+import { Order } from "./pages/Order";
+import { Route, Routes } from "react-router-dom";
 
 function App() {
   return (
     <AuthProvider>
       <NavBar />
       <div className="App">
-        <main className="container mx-auto mt-8 px-4">
-          <ProtectedRoute>
-            <Menu />
-          </ProtectedRoute>
-        </main>
+        <ProtectedRoute>
+          <Routes>
+            <Route path="/order" element={<Order />} />
+          </Routes>
+        </ProtectedRoute>
       </div>
     </AuthProvider>
   );
