@@ -21,7 +21,7 @@ export const Confirmation = (userId: any) => {
 
   return (
     <div className="bg-[#FFEDCD] min-h-screen flex items-center justify-center py-20 px-4">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -31,11 +31,11 @@ export const Confirmation = (userId: any) => {
           initial={{ scale: 0.8 }}
           animate={{ scale: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          src="../hug-fries.png"
+          src="/hug-fries.png"
           className="w-64 mx-auto mb-8 hover:scale-105 transition-transform duration-300"
           alt="fries hugging itself"
         />
-        <motion.h1 
+        <motion.h1
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.6 }}
@@ -49,13 +49,16 @@ export const Confirmation = (userId: any) => {
           transition={{ duration: 0.5, delay: 0.8 }}
           className="space-y-4"
         >
-          <p className="text-lg text-amber-950 mb-2">Merci d'avoir commandé sur OnlyFries 😏</p>
+          <p className="text-lg text-amber-950 mb-2">
+            Merci d'avoir commandé sur OnlyFries 😏
+          </p>
           <p className="text-amber-950/80">
-            La commande sera envoyée une fois que l'admin aura finalisé la commande groupée.
+            La commande sera envoyée une fois que l'admin aura finalisé la
+            commande groupée.
           </p>
         </motion.div>
         {isMainUser && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 1 }}
@@ -65,14 +68,16 @@ export const Confirmation = (userId: any) => {
           </motion.div>
         )}
         {!isMainUser && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 1 }}
             className="mt-8"
           >
             <div className="border-t border-amber-200 pt-6">
-              <h2 className="text-xl font-semibold mb-6 text-amber-950">Votre remboursement</h2>
+              <h2 className="text-xl font-semibold mb-6 text-amber-950">
+                Votre remboursement
+              </h2>
               <div className="bg-[#FFEDCD] p-6 rounded-xl shadow-md">
                 <SepaQr
                   iban="BE76363066256595"
@@ -80,7 +85,10 @@ export const Confirmation = (userId: any) => {
                   amount={1}
                   className="mx-auto mb-4"
                 />
-                <p className="text-amber-950/80 text-sm">Scannez ce QR Code avec votre app bancaire pour initier le virement.</p>
+                <p className="text-amber-950/80 text-sm">
+                  Scannez ce QR Code avec votre app bancaire pour initier le
+                  virement.
+                </p>
               </div>
             </div>
           </motion.div>

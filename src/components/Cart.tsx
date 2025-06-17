@@ -33,13 +33,13 @@ export const Cart = ({
   };
 
   return (
-    <div className="z-0 w-1/3 bg-[#FFEDCD] p-4 fixed right-0 h-[calc(100vh-80px)] top-20 shadow-lg overflow-auto">
+    <div className="z-0 w-1/3 bg-[#FFEDCD] p-4 fixed right-0 h-[calc(100vh-80px)] top-[76px] shadow-lg overflow-auto flex flex-col">
       <h2 className="text-xl font-bold pb-4 text-br text-amber-950">Panier</h2>
       {cart.length === 0 ? (
         <>
           <p className="text-gray-500">Votre panier est vide.</p>
           <img
-            src="./empty-order.png"
+            src="/empty-order.png"
             alt="Empty Cart"
             className="w-32 mx-auto"
           />
@@ -71,7 +71,7 @@ export const Cart = ({
         Total: {total.toFixed(2)}€
       </div>
       <button
-        className="bg-red-600 p-2 rounded-md text-white w-full"
+        className="bg-red-600 p-2 rounded-md text-white w-full mt-auto"
         onClick={order}
       >
         Commander

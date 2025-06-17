@@ -52,11 +52,11 @@ function App() {
         <ProtectedRoute>
           <Routes>
             <Route path="/" element={<Start userId={user.id} />} />
-            <Route path="/:sessionCode" element={<Order user={user} />} />
             <Route
               path="/:sessionCode/confirmation"
               element={<Confirmation userId={user.id} />}
             />
+            <Route path="/:sessionCode" element={<Order user={user} />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </ProtectedRoute>
