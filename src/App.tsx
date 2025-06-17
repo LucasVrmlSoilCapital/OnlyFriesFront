@@ -56,10 +56,7 @@ function App() {
             <Route path="/:sessionCode" element={<Order user={user} />} />
             <Route path="/confirmation" element={<Confirmation />} />
             <Route path="*" element={<NotFound />} />
-            <Route
-              path="/:sessionCode/refund"
-              element={<Refund />}
-            />
+            <Route path="/:sessionCode/refund" element={<Refund />} />
           </Routes>
         </ProtectedRoute>
       </div>
