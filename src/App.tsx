@@ -9,6 +9,7 @@ import Auth from "./components/Auth";
 import { getUser } from "./utils/getUser";
 import { Start } from "./components/Start";
 import { Confirmation } from "./pages/Confirmation";
+import { NotFound } from "./pages/NotFound";
 
 export type UserT = {
   id: string;
@@ -52,10 +53,8 @@ function App() {
           <Routes>
             <Route path="/" element={<Start userId={user.id} />} />
             <Route path="/:sessionCode" element={<Order user={user} />} />
-            <Route
-              path="/:sessionCode/confirmation"
-              element={<Confirmation />}
-            />
+            <Route path="/confirmation" element={<Confirmation />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </ProtectedRoute>
       </div>

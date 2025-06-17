@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { CartItem } from "../pages/Order";
 import { setItems } from "../utils/order";
 
@@ -12,6 +12,7 @@ export const Cart = ({
   onRemove: (itemId: string) => void;
 }) => {
   const { sessionCode } = useParams();
+  const navigate = useNavigate();
 
   const total = cart.reduce(
     (sum, i) => sum + i.quantity * (i.item.price?.regular || 0),
@@ -26,8 +27,9 @@ export const Cart = ({
         name: i.item.name?.["fr"] || "",
       };
     });
-    const res = await setItems(sessionCode ?? "", user, items);
-    console.log("Order response:", res);
+    await setItems(sessionCode ?? "", user, items, (data) => {
+      navigate(`/${sessionCode}/confirmation`);
+    });
   };
 
   return (
