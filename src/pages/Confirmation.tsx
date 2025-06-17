@@ -22,7 +22,7 @@ export const Confirmation = (userId: any) => {
       <div className="w-full max-w-2xl space-y-8 px-4">
         <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-200 text-center">
           <img
-            src="./hug-fries.png"
+            src="hug-fries.png"
             className="w-72 mx-auto mb-8"
             alt="fries hugging itself"
           />
