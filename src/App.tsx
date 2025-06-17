@@ -8,6 +8,7 @@ import { Route, Routes } from "react-router-dom";
 import Auth from "./components/Auth";
 import { getUser } from "./utils/getUser";
 import { Start } from "./components/Start";
+import { Confirmation } from "./pages/Confirmation";
 
 export type UserT = {
   id: string;
@@ -51,6 +52,10 @@ function App() {
           <Routes>
             <Route path="/" element={<Start userId={user.id} />} />
             <Route path="/:sessionCode" element={<Order user={user} />} />
+            <Route
+              path="/:sessionCode/confirmation"
+              element={<Confirmation />}
+            />
           </Routes>
         </ProtectedRoute>
       </div>
