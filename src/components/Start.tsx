@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 export const Start = () => {
   const [sessionId, setSessionId] = React.useState<string>("");
+  const [iban, setIban] = React.useState<string>("");
 
   const navigate = useNavigate();
 
@@ -13,7 +14,7 @@ export const Start = () => {
     if (!user.data.user?.id) {
       throw new Error("User ID is undefined");
     }
-    const session = await createSession(user.data.user.id);
+    const session = await createSession(user.data.user.id, iban);
 
     console.log(session);
 
@@ -35,7 +36,19 @@ export const Start = () => {
 
   return (
     <div>
-      <button onClick={handleCreateSession}>Nouvelle Session</button>
+      <div>
+        <input
+          id="iban"
+          name="iban"
+          type="text"
+          required
+          className="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+          placeholder="IBAN"
+          value={iban}
+          onChange={(e) => setIban(e.target.value)}
+        />
+        <button onClick={handleCreateSession}>Nouvelle Session</button>
+      </div>
 
       <div>
         <label htmlFor="session" className="sr-only">
@@ -51,6 +64,7 @@ export const Start = () => {
           value={sessionId}
           onChange={(e) => setSessionId(e.target.value)}
         />
+
         <button onClick={handleJoinSession}>Rejoindre une session</button>
       </div>
     </div>

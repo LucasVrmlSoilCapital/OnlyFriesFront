@@ -4,9 +4,9 @@ export const getUser = async () => {
   return await supabase.auth.getUser();
 };
 
-export const createSession = async (userId: string) => {
+export const createSession = async (userId: string, iban: string) => {
   const { data, error } = await supabase.functions.invoke("create_session", {
-    body: { name: "Functions", user_id: userId },
+    body: { name: "Functions", user_id: userId, iban: iban },
   });
 
   if (error) {
