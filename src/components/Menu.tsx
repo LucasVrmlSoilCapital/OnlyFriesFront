@@ -36,7 +36,7 @@ export const Menu = ({
   }, [menuData]);
 
   return (
-    <div className="p-4 max-w-xl mx-auto w-full">
+    <div className="p-4 max-w-[calc(100%*2/3)] w-full">
       {menuData ? (
         <>
           <div className="flex gap-2 mb-4 flex-wrap">
@@ -73,16 +73,13 @@ export const Menu = ({
                   item.category.id === selectedCategory
               )
               .map((item) => (
-                <li
-                  key={item.id}
-                  className="border p-3 rounded shadow-sm flex items-start"
-                >
+                <li key={item.id} className="border p-3 rounded shadow-sm flex">
                   <img
                     src={`${BASE_IMAGE_URL}${item.image}`}
                     alt={item.name?.["fr"] || "Menu item"}
                     className="w-32 rounded shadow"
                   />
-                  <div className="ml-4 w-full">
+                  <div className="ml-4 w-full flex flex-col items-start justify-between h-full">
                     <h3 className="text-lg font-semibold">
                       {item.name?.["fr"]}
                     </h3>

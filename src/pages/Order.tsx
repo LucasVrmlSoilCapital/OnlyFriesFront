@@ -7,7 +7,7 @@ export type CartItem = {
   item: MenuItemT;
   quantity: number;
 };
-export const Order = () => {
+export const Order = ({ user }: { user: any }) => {
   const [cart, setCart] = useState<CartItem[]>([]);
 
   const addToCart = (item: MenuItemT) => {
@@ -27,9 +27,9 @@ export const Order = () => {
   };
 
   return (
-    <div className="flex w-full justify-between">
+    <div className="flex w-full justify-between pt-20">
       <Menu onAddToCart={addToCart} />
-      <Cart cart={cart} onRemove={removeFromCart} />
+      <Cart cart={cart} onRemove={removeFromCart} user={user} />
     </div>
   );
 };

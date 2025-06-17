@@ -8,7 +8,6 @@ import { Route, Routes } from "react-router-dom";
 import Auth from "./components/Auth";
 import { getUser } from "./utils/getUser";
 import { Start } from "./components/Start";
-import { Menu } from "./components/Menu";
 
 export type UserT = {
   id: string;
@@ -51,10 +50,7 @@ function App() {
         <ProtectedRoute>
           <Routes>
             <Route path="/" element={<Start userId={user.id} />} />
-            <Route
-              path="/:sessionCode"
-              element={<Menu onAddToCart={() => {}} />}
-            />
+            <Route path="/:sessionCode" element={<Order user={user} />} />
           </Routes>
         </ProtectedRoute>
       </div>
