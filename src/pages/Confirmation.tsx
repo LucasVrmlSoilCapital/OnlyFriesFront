@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 
 export const Confirmation = (userId: any) => {
   const [isMainUser, setIsMainUser] = useState<boolean>(false);
-  const [iban, setIban] = useState<string>(""); 
+  const [iban, setIban] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [amount, setAmount] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -18,7 +18,10 @@ export const Confirmation = (userId: any) => {
     const callGetIsMainUser = async () => {
       try {
         setIsLoading(true);
-        const data = await getSessionInfos(userId.userId, sessionCode as string);
+        const data = await getSessionInfos(
+          userId.userId,
+          sessionCode as string
+        );
         setIsMainUser(data.data.owner_id === userId.userId);
         setIban(data.data.iban);
         setEmail(data.data.owner_email);
