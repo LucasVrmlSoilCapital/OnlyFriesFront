@@ -44,12 +44,12 @@ export const Confirmation = (userId: any) => {
   }
 
   return (
-    <div className="bg-[#FFEDCD] min-h-screen flex items-center justify-center py-20 px-4">
+    <div className="bg-[#FFE4B5] min-h-screen flex items-center justify-center py-20 px-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-2xl space-y-8 bg-[#FFE4B5] rounded-2xl shadow-xl p-8"
+        className="w-full max-w-2xl space-y-8 bg-[#FFEDCD] rounded-2xl shadow-xl p-8"
       >
         <motion.img
           initial={{ scale: 0.8 }}
