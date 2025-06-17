@@ -50,7 +50,7 @@ function App() {
       <div className="App">
         <ProtectedRoute>
           <Routes>
-            <Route path="/" element={<Start />} />
+            <Route path="/" element={<Start userId={user.id} />} />
             <Route
               path="/:sessionCode"
               element={<Menu onAddToCart={() => {}} />}

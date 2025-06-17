@@ -30,10 +30,15 @@ export const Start = (userId: any) => {
       alert("Veuillez entrer un ID de session valide.");
       return;
     }
-    const test = joinSession(sessionCode, userId);
 
-    console.log("test", test);
-    // Logic to join an existing session
+    console.log("userId", userId);
+    const { data } = await joinSession(sessionCode, userId.userId);
+
+    if (data) {
+      navigate(`/${sessionCode}`); // Redirect to the session page
+    } else {
+      alert("Erreur lors de la connexion à la session.");
+    }
   };
 
   return (
