@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const Auth: React.FC = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -9,7 +10,8 @@ const Auth: React.FC = () => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  const { signIn, signUp, resetPassword } = useAuth();
+  const { signIn, signUp } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,54 +24,36 @@ const Auth: React.FC = () => {
     setError("");
     setMessage("");
 
-    try {
-      if (isSignUp) {
-        const { error } = await signUp(email, password);
-        if (error) {
-          setError(error.message);
-        } else {
-          setMessage(
-            "Inscription réussie ! Vérifiez votre email pour confirmer votre compte."
-          );
-        }
-      } else {
-        const { error } = await signIn(email, password);
-        if (error) {
-          setError(error.message);
-        }
+    if (isSignUp) {
+      const { error: signUpError } = await signUp(email, password);
+      if (signUpError) {
+        setError(signUpError.message);
+        setLoading(false);
+        return;
       }
-    } catch (err) {
-      setError("Une erreur est survenue");
-    } finally {
+
+      const { error: signInError } = await signIn(email, password);
       setLoading(false);
-    }
-  };
 
-  const handleResetPassword = async () => {
-    if (!email) {
-      setError("Veuillez entrer votre adresse email");
-      return;
-    }
+      if (signInError) {
+        setMessage(
+          "Inscription réussie ! Vérifiez votre email pour confirmer votre compte."
+        );
+      } else {
+        navigate("/");
+      }
+    } else {
+      const { error } = await signIn(email, password);
+      setLoading(false);
 
-    setLoading(true);
-    setError("");
-    setMessage("");
-
-    try {
-      const { error } = await resetPassword(email);
       if (error) {
         setError(error.message);
       } else {
-        setMessage(
-          "Email de réinitialisation envoyé ! Vérifiez votre boîte de réception."
-        );
+        navigate("/");
       }
-    } catch (err) {
-      setError("Une erreur est survenue");
-    } finally {
-      setLoading(false);
     }
   };
+
 
   return (
     <div className="bg-[#FFEDCD] flex items-center justify-center pt-20 h-[100vh] pb-10">

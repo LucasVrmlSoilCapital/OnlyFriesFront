@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { CartItem } from "../pages/Order";
 import { setItems } from "../utils/order";
@@ -6,19 +7,23 @@ export const Cart = ({
   user,
   cart,
   onRemove,
+  isLoading,
 }: {
   user: any;
   cart: CartItem[];
   onRemove: (itemId: string) => void;
+  isLoading: boolean;
 }) => {
   const { sessionCode } = useParams();
   const navigate = useNavigate();
+  const [isLoadingOrder, setIsLoadingOrder] = useState(false);
 
   const total = cart.reduce(
     (sum, i) => sum + i.quantity * (i.item.price?.regular || 0),
     0
   );
   const order = async () => {
+    setIsLoadingOrder(true);
     const items = cart.map((i) => {
       return {
         uuid_fritzy: i.item.id,
@@ -27,10 +32,22 @@ export const Cart = ({
         name: i.item.name?.["fr"] || "",
       };
     });
-    await setItems(sessionCode ?? "", user, items, (data) => {
-      navigate(`/${sessionCode}/confirmation`);
-    });
+    try {
+      await setItems(sessionCode ?? "", user, items, (data) => {
+        navigate(`/${sessionCode}/confirmation`);
+      });
+    } finally {
+      setIsLoadingOrder(false);
+    }
   };
+
+  if (isLoading && cart.length === 0) {
+    return (
+      <div className="z-0 w-1/3 bg-[#FFEDCD] p-4 fixed right-0 h-[calc(100vh-80px)] top-[76px] shadow-lg flex justify-center items-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-amber-950"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="z-0 w-1/3 bg-[#FFEDCD] p-4 fixed right-0 h-[calc(100vh-80px)] top-[76px] shadow-lg overflow-auto flex flex-col">
@@ -70,12 +87,18 @@ export const Cart = ({
       <div className="pt-16 font-semibold text-right pb-4">
         Total: {total.toFixed(2)}€
       </div>
-      <button
-        className="bg-red-600 p-2 rounded-md text-white w-full mt-auto"
-        onClick={order}
-      >
-        Commander
-      </button>
+      <div className="mt-auto">
+        <button
+          className="bg-red-600 p-2 rounded-md text-white w-full disabled:opacity-50"
+          onClick={order}
+          disabled={isLoadingOrder}
+        >
+          {isLoadingOrder ? "Chargement..." : "Commander"}
+        </button>
+        <p className="text-xs text-center mt-2 text-gray-600">
+          Passer une nouvelle commande écrasera la précédente.
+        </p>
+      </div>
     </div>
   );
 };

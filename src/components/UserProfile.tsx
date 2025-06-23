@@ -1,12 +1,15 @@
 import React from "react";
 import { useAuth } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const UserProfile: React.FC = () => {
   const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
   const handleSignOut = async () => {
     try {
       await signOut();
+      navigate("/");
     } catch (error) {
       console.error("Erreur lors de la déconnexion:", error);
     }

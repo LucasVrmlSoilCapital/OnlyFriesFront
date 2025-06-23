@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { getSessionInfos } from "../utils/isMainUser";
 import { MainUserSessionDetails } from "../components/MainUserSessionDetails";
 import { SepaQr } from "../components/SepaQr";
@@ -44,80 +44,114 @@ export const Confirmation = (userId: any) => {
   }
 
   return (
-    <div className="bg-[#FFE4B5] min-h-screen flex items-center justify-center py-20 px-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-2xl space-y-8 bg-[#FFEDCD] rounded-2xl shadow-xl p-8"
+    <div className="bg-[#FFEDCD] min-h-screen relative py-12 px-4 sm:px-6 lg:px-8">
+      <Link
+        to={`/${sessionCode}`}
+        className="absolute top-[12vh] left-10 flex items-center text-amber-900 hover:text-amber-950 transition-colors"
       >
-        <motion.img
-          initial={{ scale: 0.8 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          src="/hug-fries.png"
-          className="w-64 mx-auto mb-8 hover:scale-105 transition-transform duration-300"
-          alt="fries hugging itself"
-        />
-        <motion.h1
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.6 }}
-          className="text-3xl font-bold text-amber-950 mb-4"
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5 mr-2"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
         >
-          Commande ajoutée !
-        </motion.h1>
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M15 19l-7-7 7-7"
+          />
+        </svg>
+        Retour au menu
+      </Link>
+      <div className="flex items-center justify-center h-full">
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.8 }}
-          className="space-y-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="w-full max-w-2xl space-y-8 p-8"
         >
-          <p className="text-lg text-amber-950 mb-2">
-            Merci d'avoir commandé sur OnlyFries 😏
-          </p>
-          <p className="text-amber-950/80">
-            La commande sera envoyée une fois que l'admin aura finalisé la
-            commande groupée.
-          </p>
-        </motion.div>
-        {isMainUser && (
+          <motion.img
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+            src="/hug-fries.png"
+            className="w-48 mx-auto mb-6"
+            alt="fries hugging itself"
+          />
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 1 }}
-            className="mt-8"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="text-center"
           >
-            <MainUserSessionDetails userId={userId.userId} />
-          </motion.div>
-        )}
-        {!isMainUser && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 1 }}
-            className="mt-8"
-          >
-            <div className="border-t border-amber-200 pt-6">
-              <h2 className="text-xl font-semibold mb-6 text-amber-950">
-                Votre remboursement
-              </h2>
-              <div className="bg-[#FFEDCD] p-6 rounded-xl shadow-md">
-                <SepaQr
-                  iban={iban}
-                  name={email}
-                  amount={amount}
-                  className="mx-auto mb-4"
-                />
-                <p className="text-amber-950/80 text-sm">
-                  Scannez ce QR Code avec votre app bancaire pour initier le
-                  virement.
+            {isMainUser ? (
+              <>
+                <h1 className="text-4xl font-extrabold text-amber-950">
+                  Vous êtes l'admin de cette session
+                </h1>
+                <p className="mt-4 text-lg text-amber-900">
+                  Attendez que tout le monde ait commandé avant de finaliser la
+                  commande groupée.
                 </p>
-              </div>
-            </div>
+                <p className="mt-2 text-amber-800/80">
+                  Votre commande a bien été ajoutée.
+                </p>
+              </>
+            ) : (
+              <>
+                <h1 className="text-4xl font-extrabold text-amber-950">
+                  Commande ajoutée !
+                </h1>
+                <p className="mt-4 text-lg text-amber-900">
+                  Merci d'avoir commandé sur OnlyFries 😏
+                </p>
+                <p className="mt-2 text-amber-800/80">
+                  La commande sera envoyée une fois que l'admin aura finalisé la
+                  commande groupée.
+                </p>
+              </>
+            )}
           </motion.div>
-        )}
-      </motion.div>
+          {isMainUser && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.4 }}
+              className="mt-8"
+            >
+              <MainUserSessionDetails userId={userId.userId} />
+            </motion.div>
+          )}
+          {!isMainUser && amount > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.4 }}
+              className="mt-8"
+            >
+              <div className="border-t border-amber-200/60 pt-6">
+                <h2 className="text-2xl font-bold mb-4 text-center text-amber-950">
+                  Remboursement
+                </h2>
+                <div className="bg-[#FFF5E6] p-6 rounded-xl shadow-inner border border-amber-200/60 text-center">
+                  <p className="mb-4 text-amber-900">
+                    Scannez ce QR Code avec votre application bancaire pour payer
+                    <strong> {amount.toFixed(2)}€</strong> à <strong>{email}</strong>.
+                  </p>
+                  <SepaQr
+                    iban={iban}
+                    name={email}
+                    amount={amount}
+                    className="mx-auto"
+                  />
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </motion.div>
+      </div>
     </div>
   );
 };

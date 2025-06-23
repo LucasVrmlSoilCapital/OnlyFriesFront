@@ -1,28 +1,21 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { MenuItemT } from "../types/menu";
 
 export const Menu = ({
   onAddToCart,
+  menuData,
+  isLoading,
 }: {
   onAddToCart: (item: MenuItemT) => void;
+  menuData: MenuItemT[] | null;
+  isLoading: boolean;
 }) => {
-  const [menuData, setMenuData] = useState<null | MenuItemT[]>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(
+    null
+  );
 
   const BASE_IMAGE_URL =
     "https://wmdadhuhhzahjdtmjqne.supabase.co/storage/v1/render/image/public/library/";
-
-  useEffect(() => {
-    fetch("https://api.fritzy.be/menu/b5ce1d14-b4b4-493c-846b-eaab8a464240")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then((data) => setMenuData(data.data))
-      .catch((error) => console.error("Fetch error:", error));
-  }, []);
 
   const categories = useMemo(() => {
     if (!menuData) return [];
@@ -37,7 +30,11 @@ export const Menu = ({
 
   return (
     <div className="p-4 max-w-[calc(100%*2/3)] w-full">
-      {menuData ? (
+      {isLoading ? (
+        <div className="flex justify-center items-center h-[85vh]">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-amber-950"></div>
+        </div>
+      ) : menuData ? (
         <>
           <div className="flex gap-2 mb-4 flex-wrap">
             <button
@@ -93,7 +90,8 @@ export const Menu = ({
                     )}
                     <button
                       onClick={() => onAddToCart(item)}
-                      className="mt-2 px-8 py-1 bg-red-600 text-white rounded"
+                      className="mt-2 px-8 py-1 bg-red-600 text-white rounded disabled:opacity-50"
+                      disabled={isLoading}
                     >
                       Ajouter
                     </button>
@@ -103,7 +101,7 @@ export const Menu = ({
           </ul>
         </>
       ) : (
-        <div>Loading</div>
+        <div>Le menu n'a pas pu être chargé.</div>
       )}
     </div>
   );
