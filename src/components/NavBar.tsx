@@ -1,6 +1,7 @@
 import { useState } from "react";
 import UserProfile from "./UserProfile";
 import { useLocation, useNavigate } from "react-router-dom";
+import { Button, StyledOnlyFries } from "./ui";
 
 export const NavBar = () => {
   const [showProfile, setShowProfile] = useState(false);
@@ -10,7 +11,7 @@ export const NavBar = () => {
   const navigate = useNavigate();
 
   const pathParts = location.pathname.split("/");
-  const sessionCode = pathParts.length > 1 ? pathParts[1] : null;
+  const sessionCode = pathParts[1] === "session" && pathParts.length > 2 ? pathParts[2] : null;
 
   const handleCopyCode = () => {
     if (sessionCode) {
@@ -27,65 +28,88 @@ export const NavBar = () => {
     }
   };
   return (
-    <header className="bg-amber-950 text-[#FFEDCD] p-1 flex gap-2 items-center pr-14 pl-6 fixed w-full z-50">
+    <header className="bg-warm-500 text-cream-10 h-[8vh] p-4 flex gap-4 items-center fixed w-full z-50 shadow-soft border-b border-warm-600">
       <img
         src="/logo.png"
-        className="w-16 rounded-md cursor-pointer"
+        className="w-12 h-12 rounded-2xl cursor-pointer transition-transform hover:scale-105 shadow-soft"
         alt="happy fries"
         onClick={() => navigate("/")}
       />
+      
       {sessionCode ? (
-        <>
-          <p className=" " title="Click to copy session code">
-            Code de session: {sessionCode}
-          </p>
+        <div className="flex items-center gap-3 bg-cream-100/90 px-3 py-2 rounded-xl border border-cream-200/50">
+          <div className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+            <span className="text-neutral-600 font-medium text-xs">Actif</span>
+          </div>
+          
+          <div className="flex items-center gap-2 bg-white/90 px-3 py-1.5 rounded-lg border border-neutral-200/50">
+            <span className="text-neutral-500 font-medium text-xs">Code:</span>
+            <span className="font-bold text-sm text-neutral-800 tracking-wide">{sessionCode}</span>
+          </div>
 
-          {!copied ? (
-            <svg
-              onClick={handleCopyCode}
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="size-6 cursor-pointer"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z"
-              />
-            </svg>
-          ) : (
-            <span className="flex">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleCopyCode}
+            className="text-neutral-500 hover:text-neutral-700 hover:bg-cream-200/60 p-1.5 rounded-lg transition-all duration-200"
+            title="Copier le code"
+          >
+            {!copied ? (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
-                strokeWidth={1.5}
+                strokeWidth={2}
                 stroke="currentColor"
-                className="size-6"
+                className="w-3.5 h-3.5"
               >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0 1 18 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3 1.5 1.5 3-3.75"
+                  d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184"
                 />
               </svg>
-              Copié!
-            </span>
-          )}
-        </>
+            ) : (
+              <div className="flex items-center gap-1.5">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  stroke="currentColor"
+                  className="w-3.5 h-3.5 text-success-500"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M4.5 12.75l6 6 9-13.5"
+                  />
+                </svg>
+                <span className="text-xs font-medium text-success-600">Copié</span>
+              </div>
+            )}
+          </Button>
+        </div>
       ) : (
-        <h1 className="text-2xl font-bold ">Only Fries</h1>
+        <StyledOnlyFries size="md" className="!text-cream-100" />
       )}
-      <img
-        src="/user.png"
-        className="w-16 h-16 cursor-pointer rounded-full overflow-hidden ml-auto p-1"
-        alt="user icon"
-        onClick={() => setShowProfile(!showProfile)}
-      />
-      {showProfile && <UserProfile />}
+      
+      <div 
+        className="ml-auto relative flex items-center justify-center"
+        onMouseEnter={() => setShowProfile(true)}
+        onMouseLeave={() => setShowProfile(false)}
+      >
+        <button className="transition-all duration-200 hover:scale-105">
+          <img
+            src="/user.png"
+            className="w-12 h-12 rounded-2xl border-2 border-warm-400 hover:border-warm-300 transition-colors shadow-soft"
+            alt="Profil utilisateur"
+          />
+        </button>
+        
+        {showProfile && <UserProfile />}
+      </div>
     </header>
   );
 };

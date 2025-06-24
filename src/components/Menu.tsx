@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { MenuItemT } from "../types/menu";
+import { Button, LoadingSpinner, Card } from "./ui";
 
 export const Menu = ({
   onAddToCart,
@@ -22,86 +23,113 @@ export const Menu = ({
     const seen = new Map();
     for (const item of menuData) {
       if (item.category && item.category.id && !seen.has(item.category.id)) {
-        seen.set(item.category.id, item.category.name.fr); // You can change .fr to dynamic language
+        seen.set(item.category.id, item.category.name?.fr || item.category.name?.en || 'Catégorie'); // Sécurisé
       }
     }
     return Array.from(seen.entries()); // [ [id, name], ... ]
   }, [menuData]);
 
   return (
-    <div className="p-4 max-w-[calc(100%*2/3)] w-full">
+    <div className="p-4 max-w-[calc(100%*2/3)] w-full bg-cream-300">
       {isLoading ? (
-        <div className="flex justify-center items-center h-[85vh]">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-amber-950"></div>
+        <div className="flex flex-col justify-center items-center h-[85vh] gap-3">
+          <LoadingSpinner size="lg" />
+          <p className="text-neutral-600 text-sm">Chargement du menu...</p>
         </div>
       ) : menuData ? (
         <>
-          <div className="flex gap-2 mb-4 flex-wrap">
-            <button
+          {/* Category Filters */}
+          <div className="flex gap-3 mb-8 flex-wrap">
+            <Button
               onClick={() => setSelectedCategory(null)}
-              className={`px-3 py-1 rounded ${
-                selectedCategory === null
-                  ? "bg-red-600 text-white"
-                  : "bg-[#FFEDCD] text-amber-950"
-              }`}
+              variant={selectedCategory === null ? "primary" : "secondary"}
+              size="md"
+              className="rounded-full"
             >
               Tous
-            </button>
+            </Button>
             {categories.map(([id, name]) => (
-              <button
+              <Button
                 key={id}
                 onClick={() => setSelectedCategory(id)}
-                className={`px-3 py-1 rounded ${
-                  selectedCategory === id
-                    ? "bg-red-600 text-white"
-                    : "bg-[#FFEDCD] text-amber-950"
-                }`}
+                variant={selectedCategory === id ? "primary" : "secondary"}
+                size="md"
+                className="rounded-full"
               >
                 {name}
-              </button>
+              </Button>
             ))}
           </div>
-          <ul className="space-y-4">
+          
+          {/* Menu Items */}
+          <div className="grid gap-4">
             {menuData
               .filter((item) => item.active && !item.hidden)
               .filter(
                 (item) =>
                   selectedCategory === null ||
-                  item.category.id === selectedCategory
+                  item.category?.id === selectedCategory
               )
               .map((item) => (
-                <li key={item.id} className="border p-3 rounded shadow-sm flex">
-                  <img
-                    src={`${BASE_IMAGE_URL}${item.image}`}
-                    alt={item.name?.["fr"] || "Menu item"}
-                    className="w-32 rounded shadow"
-                  />
-                  <div className="ml-4 w-full flex flex-col items-start justify-between h-full">
-                    <h3 className="text-lg font-semibold">
-                      {item.name?.["fr"]}
-                    </h3>
-                    <p className="text-sm text-gray-600">
-                      {item.price?.regular?.toFixed(2)}€
-                    </p>
-                    {item.description?.["fr"] && (
-                      <p className="text-sm text-gray-500 mt-1">
-                        {item.description["fr"]}
-                      </p>
-                    )}
-                    <button
-                      onClick={() => onAddToCart(item)}
-                      className="mt-2 px-8 py-1 bg-red-600 text-white rounded disabled:opacity-50"
-                      disabled={isLoading}
-                    >
-                      Ajouter
-                    </button>
+                <Card 
+                  key={item.id} 
+                  variant="elevated"
+                  padding="none" 
+                  rounded="lg"
+                  className="bg-white border border-neutral-100 shadow-soft"
+                >
+                  <div className="py-4 pr-4 pl-4 grid grid-cols-3 items-center gap-4">
+                    {/* Partie 1: Titre et prix à gauche */}
+                    <div className="flex flex-row gap-8 items-center justify-start">
+                      <img
+                          src={`${BASE_IMAGE_URL}${item.image}`}
+                          alt={item.name?.["fr"] || "Item du menu"}
+                          className="w-20 h-20 rounded-lg object-cover"
+                        />
+                        <div className="flex flex-col justify-center items-start">
+                      <h3 className="text-xl font-bold text-neutral-800 mb-1 whitespace-nowrap truncate">
+                        {item.name?.["fr"] || item.name?.["en"] || 'Item'}
+                      </h3>
+                      <div className="text-xl font-bold text-primary-600">
+                        {item.price?.regular?.toFixed(2)}€
+                      </div>
+                    </div>
+                    </div>
+                    
+                    {/* Partie 2: Espace vide */}
+                    <div></div>
+                    
+                    {/* Partie 3: Image et bouton à droite */}
+                    <div className="flex items-center gap-4 justify-end">
+                      <Button
+                        onClick={() => onAddToCart(item)}
+                        variant="primary"
+                        size="md"
+                        disabled={isLoading}
+                        className="w-12 h-12 rounded-lg p-0 flex items-center justify-center"
+                      >
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                        </svg>
+                      </Button>
+                    </div>
                   </div>
-                </li>
+                </Card>
               ))}
-          </ul>
+          </div>
         </>
       ) : (
-        <div>Le menu n'a pas pu être chargé.</div>
+        <Card variant="outlined" padding="lg" className="text-center">
+          <div className="flex flex-col items-center gap-3">
+            <svg className="w-12 h-12 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <div>
+              <h3 className="text-base font-semibold text-neutral-700 mb-1">Menu indisponible</h3>
+              <p className="text-sm text-neutral-600">Le menu n'a pas pu être chargé.</p>
+            </div>
+          </div>
+        </Card>
       )}
     </div>
   );

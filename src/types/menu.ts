@@ -10,6 +10,7 @@ export type MenuItemT = {
   options: MenuItemOptionT[];
   price: PriceT;
   sort: string;
+  allow_comment?: boolean;
 };
 
 type MenuItemCategoryT = {
@@ -18,21 +19,41 @@ type MenuItemCategoryT = {
   shorten: boolean;
 };
 
-type MenuItemOptionT = {
+export type MenuItemOptionT = {
   id: string;
   restaurant: string;
   name: { [lang: string]: string };
-  options: OptionsT[];
+  description?: { [lang: string]: string };
+  type: number;
+  options: OptionChoiceT[];
+  active: boolean;
+  sort: number;
+  max: number | null;
+  required: boolean;
+  shorten: boolean;
 };
 
-type OptionsT = {
-  id: string;
+export type OptionChoiceT = {
+  id: number;
   name: { [lang: string]: string };
-  price: {};
+  price: {
+    regular?: string;
+    discounted?: string;
+  };
   active: boolean;
 };
 
 type PriceT = {
   regular: number;
   discounted: number;
+};
+
+export type SelectedOption = {
+  optionId: string;
+  optionName: string;
+  choices: {
+    choiceId: number;
+    choiceName: string;
+    price: number;
+  }[];
 };
