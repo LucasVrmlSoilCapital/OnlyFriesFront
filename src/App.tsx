@@ -1,14 +1,15 @@
 import React from "react";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
-import ProtectedRoute from "./components/ProtectedRoute";
+import { ProtectedRoute, NavBar } from "./components/layout";
 import "./App.css";
-import { NavBar } from "./components/NavBar";
-import { Order } from "./pages/Order";
 import { Route, Routes } from "react-router-dom";
-import Auth from "./components/Auth";
-import { Start } from "./components/Start";
-import { Confirmation } from "./pages/Confirmation";
-import { NotFound } from "./pages/NotFound";
+import { 
+  StartPage, 
+  AuthPage, 
+  OrderPage, 
+  ConfirmationPage, 
+  NotFoundPage 
+} from "./pages";
 
 export type UserT = {
   id: string;
@@ -32,14 +33,14 @@ const AppContent: React.FC = () => {
       <div className="App">
         <Routes>
           {/* Route publique pour l'authentification */}
-          <Route path="/auth" element={<Auth />} />
+          <Route path="/auth" element={<AuthPage />} />
           
           {/* Routes protégées */}
           <Route
             path="/"
             element={
               <ProtectedRoute>
-                <Start userId={user?.id} />
+                <StartPage userId={user?.id} />
               </ProtectedRoute>
             }
           />
@@ -47,7 +48,7 @@ const AppContent: React.FC = () => {
             path="/session/:sessionCode/confirmation"
             element={
               <ProtectedRoute>
-                <Confirmation userId={user?.id} />
+                <ConfirmationPage userId={user?.id} />
               </ProtectedRoute>
             }
           />
@@ -55,11 +56,11 @@ const AppContent: React.FC = () => {
             path="/session/:sessionCode"
             element={
               <ProtectedRoute>
-                <Order user={user} />
+                <OrderPage user={user} />
               </ProtectedRoute>
             }
           />
-          <Route path="*" element={<NotFound />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </div>
     </>
