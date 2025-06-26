@@ -9,7 +9,9 @@ interface SessionDetailsPageProps {
   userId: string;
 }
 
-export const SessionDetailsPage: React.FC<SessionDetailsPageProps> = ({ userId }) => {
+export const SessionDetailsPage: React.FC<SessionDetailsPageProps> = ({
+  userId,
+}) => {
   const {
     usersWithItems,
     orderedUsers,
@@ -17,14 +19,17 @@ export const SessionDetailsPage: React.FC<SessionDetailsPageProps> = ({ userId }
     isLoading,
     error,
     fritzyLink,
-    grandTotal
+    grandTotal,
+    sessionCode,
   } = useSessionDetails(userId);
 
   if (isLoading) {
     return (
       <div className="p-4 bg-cream-300 h-screen flex justify-start items-center flex-col">
         <LoadingSpinner size="lg" />
-        <p className="mt-4 text-neutral-600">Chargement des données de session...</p>
+        <p className="mt-4 text-neutral-600">
+          Chargement des données de session...
+        </p>
       </div>
     );
   }
@@ -43,14 +48,18 @@ export const SessionDetailsPage: React.FC<SessionDetailsPageProps> = ({ userId }
   return (
     <div className="bg-cream-300 min-h-screen">
       <div className="max-w-7xl mx-auto p-6">
-        <h1 className="text-3xl font-bold mb-8 text-warm-800">Récapitulatif de la session</h1>
-        
+        <h1 className="text-3xl font-bold mb-8 text-warm-800">
+          Récapitulatif de la session
+        </h1>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
           {/* Colonne principale - Commandes par utilisateur */}
           <div className="lg:col-span-2 space-y-6">
             {usersWithItems.length === 0 ? (
               <div className="bg-cream-200 p-6 rounded-lg shadow border border-cream-400 text-center">
-                <p className="text-neutral-800">Aucune commande pour le moment</p>
+                <p className="text-neutral-800">
+                  Aucune commande pour le moment
+                </p>
               </div>
             ) : (
               usersWithItems.map((userWithItems) => (
@@ -70,6 +79,7 @@ export const SessionDetailsPage: React.FC<SessionDetailsPageProps> = ({ userId }
               grandTotal={grandTotal}
               orderCount={usersWithItems.length}
               fritzyLink={fritzyLink}
+              sessionCode={sessionCode}
             />
 
             <UserStatusList
@@ -81,4 +91,4 @@ export const SessionDetailsPage: React.FC<SessionDetailsPageProps> = ({ userId }
       </div>
     </div>
   );
-}; 
+};

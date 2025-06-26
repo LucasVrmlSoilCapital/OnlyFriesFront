@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { getAllItemsPerUser } from '../api/orders';
-import { getSessionUsers } from '../api/sessions';
-import { MenuItemT } from '../types/menu';
-import { generateFritzyLink } from '../utils/fritzyLinkGenerator';
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { getAllItemsPerUser } from "../api/orders";
+import { getSessionUsers } from "../api/sessions";
+import { MenuItemT } from "../types/menu";
+import { generateFritzyLink } from "../utils/fritzyLinkGenerator";
 
 interface Item {
   id: number;
@@ -61,16 +61,19 @@ export const useSessionDetails = (userId: string) => {
           "https://api.fritzy.be/menu/b5ce1d14-b4b4-493c-846b-eaab8a464240"
         );
         if (!menuResponse.ok) {
-          throw new Error('Erreur lors du chargement du menu');
+          throw new Error("Erreur lors du chargement du menu");
         }
         const menuJson = await menuResponse.json();
         const currentMenuData = menuJson.data;
         setMenuData(currentMenuData);
 
         // Récupérer les données avec le nouveau format
-        const itemsResponse = await getAllItemsPerUser(sessionCode as string, userId);
+        const itemsResponse = await getAllItemsPerUser(
+          sessionCode as string,
+          userId
+        );
         const usersWithItemsData: UserWithItems[] = itemsResponse.users;
-        
+
         // Récupérer tous les utilisateurs de la session
         const usersResponse = await getSessionUsers(sessionCode as string);
         setAllUsers(usersResponse.users);
@@ -82,7 +85,10 @@ export const useSessionDetails = (userId: string) => {
           setFritzyLink(link);
         }
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Erreur lors de la récupération des données';
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : "Erreur lors de la récupération des données";
         setError(errorMessage);
         console.error("Erreur lors de la récupération des données:", error);
       } finally {
@@ -96,13 +102,16 @@ export const useSessionDetails = (userId: string) => {
   }, [sessionCode, userId]);
 
   const grandTotal = usersWithItems.reduce((total, userWithItems) => {
-    return total + userWithItems.items.reduce((userTotal, item) => {
-      return userTotal + item.price_total;
-    }, 0);
+    return (
+      total +
+      userWithItems.items.reduce((userTotal, item) => {
+        return userTotal + item.price_total;
+      }, 0)
+    );
   }, 0);
 
-  const orderedUsers = allUsers.filter(user => user.has_ordered);
-  const pendingUsers = allUsers.filter(user => !user.has_ordered);
+  const orderedUsers = allUsers.filter((user) => user.has_ordered);
+  const pendingUsers = allUsers.filter((user) => !user.has_ordered);
 
   return {
     usersWithItems,
@@ -113,6 +122,7 @@ export const useSessionDetails = (userId: string) => {
     error,
     fritzyLink,
     grandTotal,
-    menuData
+    menuData,
+    sessionCode,
   };
-}; 
+};
