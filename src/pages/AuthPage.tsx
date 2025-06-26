@@ -14,6 +14,7 @@ const AuthPage: React.FC = () => {
     error,
     handleSubmit,
     toggleMode,
+    handleSlackLogin
   } = useAuthPageLogic();
 
 
@@ -43,6 +44,34 @@ const AuthPage: React.FC = () => {
                 : "Connectez-vous pour accéder à vos sessions"
               }
             </p>
+          </div>
+
+          <div className="flex items-center justify-center bg-gray-100 p-4 mb-6">
+            <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-sm text-center">
+              <h1 className="text-1xl font-bold mb-6">Connectez-vous pour commander des Frites 🍟</h1>
+
+              <button
+                onClick={handleSlackLogin}
+                className="w-full flex items-center justify-center gap-3 bg-[#4A154B] hover:bg-[#3c103d] text-white font-medium py-3 px-5 rounded-lg transition"
+              >
+                <img
+                  src="https://a.slack-edge.com/80588/marketing/img/icons/icon_slack_hash_colored.png"
+                  alt="Slack"
+                  className="w-5 h-5"
+                />
+                Continuer avec Slack
+              </button>
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div className="relative mb-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-neutral-200" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-3 bg-white text-neutral-500 font-medium">ou</span>
+            </div>
           </div>
 
           {/* Form */}

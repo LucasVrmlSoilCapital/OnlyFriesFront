@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "../supabaseClient";
 
 export const useAuthPageLogic = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -61,6 +62,15 @@ export const useAuthPageLogic = () => {
     }
   };
 
+  const handleSlackLogin = async () => {
+    await supabase.auth.signInWithOAuth({
+      provider: "slack_oidc",
+      options: {
+        redirectTo: "https://onlyfries-ashy.vercel.app",
+      },
+    });
+  };
+
   const toggleMode = () => {
     setIsSignUp(!isSignUp);
     setError("");
@@ -77,9 +87,10 @@ export const useAuthPageLogic = () => {
     loading,
     message,
     error,
-    
+
     // Actions
     handleSubmit,
     toggleMode,
+    handleSlackLogin,
   };
-}; 
+};
