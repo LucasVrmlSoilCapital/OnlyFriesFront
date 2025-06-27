@@ -14,16 +14,15 @@ const AuthPage: React.FC = () => {
     error,
     handleSubmit,
     toggleMode,
-    handleSlackLogin
+    handleSlackLogin,
   } = useAuthPageLogic();
-
 
   return (
     <div className="bg-cream-300 min-h-screen flex items-center justify-center pt-24 pb-12 px-4">
       <div className="w-full max-w-md">
         {/* Auth Card */}
-        <Card 
-          variant="elevated" 
+        <Card
+          variant="elevated"
           padding="xl"
           rounded="lg"
           className="bg-gradient-to-br from-white to-cream-100"
@@ -31,22 +30,31 @@ const AuthPage: React.FC = () => {
           {/* Header */}
           <div className="text-center mb-8">
             <div className="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-soft">
-              <svg className="w-10 h-10 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+              <svg
+                className="w-10 h-10 text-primary-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                />
               </svg>
             </div>
             <h2 className="text-3xl font-bold text-neutral-800 mb-3">
               {isSignUp ? "Créer un compte" : "Connexion"}
             </h2>
             <p className="text-neutral-600">
-              {isSignUp 
-                ? "Rejoignez OnlyFries pour commencer 🍟" 
-                : "Connectez-vous pour accéder à vos sessions"
-              }
+              {isSignUp
+                ? "Rejoignez OnlyFries pour commencer 🍟"
+                : "Connectez-vous pour accéder à vos sessions"}
             </p>
           </div>
 
-          <div className="flex items-center justify-center bg-gray-100 p-4 mb-6">
+          {/* <div className="flex items-center justify-center bg-gray-100 p-4 mb-6">
             <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-sm text-center">
               <h1 className="text-1xl font-bold mb-6">Connectez-vous pour commander des Frites 🍟</h1>
 
@@ -62,17 +70,19 @@ const AuthPage: React.FC = () => {
                 Continuer avec Slack
               </button>
             </div>
-          </div>
+          </div> */}
 
           {/* Divider */}
-          <div className="relative mb-6">
+          {/* <div className="relative mb-6">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-neutral-200" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-3 bg-white text-neutral-500 font-medium">ou</span>
+              <span className="px-3 bg-white text-neutral-500 font-medium">
+                ou
+              </span>
             </div>
-          </div>
+          </div> */}
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -103,13 +113,17 @@ const AuthPage: React.FC = () => {
             {/* Messages */}
             {error && (
               <div className="bg-error-50 border border-error-200 rounded-2xl p-4">
-                <p className="text-error-700 text-sm text-center font-medium">{error}</p>
+                <p className="text-error-700 text-sm text-center font-medium">
+                  {error}
+                </p>
               </div>
             )}
 
             {message && (
               <div className="bg-success-50 border border-success-200 rounded-2xl p-4">
-                <p className="text-success-700 text-sm text-center font-medium">{message}</p>
+                <p className="text-success-700 text-sm text-center font-medium">
+                  {message}
+                </p>
               </div>
             )}
 
@@ -137,7 +151,9 @@ const AuthPage: React.FC = () => {
                 <div className="w-full border-t border-neutral-200" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-3 bg-white text-neutral-500 font-medium">ou</span>
+                <span className="px-3 bg-white text-neutral-500 font-medium">
+                  ou
+                </span>
               </div>
             </div>
 
@@ -160,4 +176,4 @@ const AuthPage: React.FC = () => {
   );
 };
 
-export { AuthPage }; 
+export { AuthPage };
