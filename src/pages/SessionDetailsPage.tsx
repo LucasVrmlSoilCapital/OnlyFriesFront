@@ -21,6 +21,10 @@ export const SessionDetailsPage: React.FC<SessionDetailsPageProps> = ({
     fritzyLink,
     grandTotal,
     sessionCode,
+    isMainUser,
+    orderingInProgress,
+    orderConfirmed,
+    markAsOrdered,
   } = useSessionDetails(userId);
 
   if (isLoading) {
@@ -48,9 +52,11 @@ export const SessionDetailsPage: React.FC<SessionDetailsPageProps> = ({
   return (
     <div className="bg-cream-300 min-h-screen">
       <div className="max-w-7xl mx-auto p-6">
-        <h1 className="text-3xl font-bold mb-8 text-warm-800">
-          Récapitulatif de la session
-        </h1>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-warm-800">
+            Récapitulatif de la session
+          </h1>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
           {/* Colonne principale - Commandes par utilisateur */}
@@ -80,6 +86,10 @@ export const SessionDetailsPage: React.FC<SessionDetailsPageProps> = ({
               orderCount={usersWithItems.length}
               fritzyLink={fritzyLink}
               sessionCode={sessionCode}
+              isMainUser={isMainUser}
+              orderingInProgress={orderingInProgress}
+              orderConfirmed={orderConfirmed}
+              markAsOrdered={markAsOrdered}
             />
 
             <UserStatusList

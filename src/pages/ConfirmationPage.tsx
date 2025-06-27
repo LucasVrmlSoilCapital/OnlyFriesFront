@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
 import { SessionDetailsPage } from "./SessionDetailsPage";
+import { UserOrderCard } from "../components/session/UserOrderCard";
 import { SepaQr } from "../components/payment";
 import { motion } from "framer-motion";
 import { LoadingSpinner, Card } from "../components/ui";
 import { useConfirmationPageLogic } from "../hooks";
+import { useAuth } from "../contexts/AuthContext";
 
 export const ConfirmationPage = (userId: any) => {
   const {
@@ -13,7 +15,12 @@ export const ConfirmationPage = (userId: any) => {
     amount,
     isLoading,
     sessionCode,
+    isOrdered,
+    initialLoadDone,
+    userItems,
   } = useConfirmationPageLogic(userId);
+
+  const { user } = useAuth();
 
   if (isLoading) {
     return (
@@ -26,9 +33,12 @@ export const ConfirmationPage = (userId: any) => {
     );
   }
 
+  // Indicateur de polling pour les non-main-users en attente
+  const isPolling = initialLoadDone && !isMainUser && !isOrdered;
+
   return (
     <div className="bg-cream-300 min-h-screen relative">
-      {/* Bouton retour repositionné */}
+      {/* Bouton retour */}
       <Link
         to={`/session/${sessionCode}`}
         className="absolute top-[10vh] left-8 z-10 inline-flex items-center gap-2 px-4 py-2 text-brand-700 hover:text-brand-800 hover:bg-cream-400/60 rounded-xl transition-all duration-200 backdrop-blur-sm"
@@ -100,29 +110,50 @@ export const ConfirmationPage = (userId: any) => {
                       </svg>
                     </div>
                     <h1 className="text-3xl font-bold text-brand-800">
-                      Commande ajoutée !
+                      {isOrdered ? "Commande confirmée !" : "Commande ajoutée !"}
                     </h1>
                   </div>
                   <p className="text-lg text-brand-700 max-w-2xl mx-auto">
-                    Merci d'avoir commandé sur OnlyFries ! 🍟 Votre commande a été ajoutée à la session.
+                    {isOrdered 
+                      ? "Excellente nouvelle ! La commande groupée a été confirmée et envoyée ! 🎉"
+                      : "Merci d'avoir commandé sur OnlyFries ! 🍟 Votre commande a été ajoutée à la session."
+                    }
                   </p>
                 </>
               )}
             </motion.div>
           </div>
 
-          {/* Section d'information */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.4 }}
-          >
-            <Card 
-              variant="elevated" 
-              padding="lg" 
-              className="bg-cream-200 backdrop-blur-sm border-none"
+          {/* Récapitulatif de commande pour les non-main users */}
+          {!isMainUser && userItems.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.3 }}
             >
-              {isMainUser ? (
+              <h2 className="text-2xl font-bold text-brand-800 mb-4 text-center">
+                Récapitulatif de votre commande
+              </h2>
+              <UserOrderCard
+                userEmail={user?.email || "Utilisateur"}
+                userId={userId.userId}
+                items={userItems}
+              />
+            </motion.div>
+          )}
+
+          {/* Section d'information pour les main users */}
+          {isMainUser ? (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.4 }}
+            >
+              <Card 
+                variant="elevated" 
+                padding="lg" 
+                className="bg-cream-200 backdrop-blur-sm border-none"
+              >
                 <div className="space-y-4">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-8 h-8 bg-cream-200 rounded-lg flex items-center justify-center">
@@ -139,26 +170,105 @@ export const ConfirmationPage = (userId: any) => {
                     </p>
                   </div>
                 </div>
-                              ) : (
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-3 mb-2">
+              </Card>
+            </motion.div>
+          ) : (
+            /* Bloc unifié pour les non-main users : statut + paiement */
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.4 }}
+            >
+              <Card 
+                variant="elevated" 
+                padding="lg" 
+                className="bg-cream-200 backdrop-blur-sm border-none"
+              >
+                <div className="space-y-6">
+                  {/* Section statut */}
+                  <div>
+                    <div className="flex items-center gap-3 mb-4">
                       <div className="w-8 h-8 bg-cream-200 rounded-lg flex items-center justify-center">
-                        <svg className="w-5 h-5 text-warning-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
+                        {isPolling ? (
+                          <LoadingSpinner size="sm" />
+                        ) : (
+                          <svg className="w-5 h-5 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"/>
+                          </svg>
+                        )}
                       </div>
-                      <h3 className="text-lg font-semibold text-brand-800">En attente de finalisation</h3>
+                      <h3 className="text-lg font-semibold text-brand-800">
+                        {isOrdered ? "Commande finalisée" : "En attente de confirmation"}
+                      </h3>
                     </div>
-                    <div className="bg-cream-200 rounded-lg p-4">
-                      <p className="text-warning-700">
-                        La commande sera envoyée une fois que l'administrateur aura finalisé la commande groupée. 
-                        Vous recevrez une confirmation par la suite.
-                      </p>
+                    <div className="bg-cream-200 rounded-lg p-4 mb-4">
+                      {isPolling ? (
+                        <div className="text-center space-y-3">
+                          <p className="text-warning-700">
+                            L'administrateur de la session doit confirmer que la commande groupée a été passée.
+                          </p>
+                          <div className="flex items-center justify-center gap-2 text-sm text-neutral-600">
+                            <span>Vérification automatique toutes les 5 secondes...</span>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-success-700">
+                          Votre commande a été envoyée avec succès ! Vous devriez recevoir votre délicieuse commande bientôt. 🍟
+                        </p>
+                      )}
                     </div>
                   </div>
-                )}
-            </Card>
-          </motion.div>
+
+                  {/* Section paiement */}
+                  {amount > 0 && (
+                    <div className="border-t border-cream-300 pt-4">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-8 h-8 bg-cream-300 rounded-lg flex items-center justify-center">
+                          <svg className="w-5 h-5 text-warning-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+                          </svg>
+                        </div>
+                        <h3 className="text-lg font-semibold text-brand-800">
+                          Paiement {isOrdered ? "requis" : "en attente"}
+                        </h3>
+                      </div>
+                      
+                      <div className="bg-cream-100 rounded-lg p-6">
+                        <div className="text-center space-y-4">
+                          <p className="text-brand-700 text-base">
+                            {isOrdered ? (
+                              <>
+                                Scannez ce QR Code avec votre application bancaire pour payer{' '}
+                                <span className="font-bold text-brand-800 text-lg">{amount.toFixed(2)}€</span> à{' '}
+                                <span className="font-semibold text-brand-800">{email}</span> sur le compte suivant :{' '}
+                                <span className="font-semibold text-brand-800">{iban}</span>
+                              </>
+                            ) : (
+                              <>
+                                Vous devrez payer{' '}
+                                <span className="font-bold text-brand-800 text-lg">{amount.toFixed(2)}€</span> à{' '}
+                                <span className="font-semibold text-brand-800">{email}</span> une fois la commande confirmée.
+                              </>
+                            )}
+                          </p>
+                          {isOrdered && (
+                            <div className="flex justify-center">
+                              <SepaQr
+                                iban={iban}
+                                name={email}
+                                amount={amount}
+                                className="mx-auto"
+                              />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </Card>
+            </motion.div>
+          )}
 
           {isMainUser && (
             <motion.div
@@ -167,51 +277,6 @@ export const ConfirmationPage = (userId: any) => {
               transition={{ duration: 0.4, delay: 0.4 }}
             >
               <SessionDetailsPage userId={userId.userId} />
-            </motion.div>
-          )}
-          
-          {!isMainUser && amount > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.6 }}
-            >
-              <Card 
-                variant="elevated" 
-                padding="lg" 
-                className="bg-cream-200 backdrop-blur-sm border-none"
-              >
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-cream-300 rounded-lg flex items-center justify-center">
-                      <svg className="w-5 h-5 text-warning-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
-                      </svg>
-                    </div>
-                    <h2 className="text-xl font-bold text-brand-800">
-                      Paiement requis
-                    </h2>
-                  </div>
-                  
-                  <div className="bg-cream-100 rounded-lg p-6">
-                    <div className="text-center space-y-4">
-                      <p className="text-brand-700 text-base">
-                        Scannez ce QR Code avec votre application bancaire pour payer{' '}
-                        <span className="font-bold text-brand-800 text-lg">{amount.toFixed(2)}€</span> à{' '}
-                        <span className="font-semibold text-brand-800">{email}</span>
-                      </p>
-                      <div className="flex justify-center">
-                        <SepaQr
-                          iban={iban}
-                          name={email}
-                          amount={amount}
-                          className="mx-auto"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </Card>
             </motion.div>
           )}
         </motion.div>

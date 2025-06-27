@@ -54,3 +54,33 @@ export const getSessionUsers = async (sessionCode: string) => {
 
   return data;
 };
+
+/**
+ * Marque une session comme commandée (pour les admins)
+ */
+export const setSessionIsOrdered = async (sessionCode: string, userId: string) => {
+  const { data, error } = await supabase.functions.invoke("set_session_is_ordered", {
+    body: { code: sessionCode, user_id: userId },
+  });
+
+  if (error) {
+    throw new Error(`Error setting session as ordered: ${error.message}`);
+  }
+
+  return data;
+};
+
+/**
+ * Vérifie si une session a été commandée
+ */
+export const isSessionOrdered = async (sessionCode: string, userId: string) => {
+  const { data, error } = await supabase.functions.invoke("is_session_ordered", {
+    body: { code: sessionCode, user_id: userId },
+  });
+
+  if (error) {
+    throw new Error(`Error checking if session is ordered: ${error.message}`);
+  }
+
+  return data;
+};
