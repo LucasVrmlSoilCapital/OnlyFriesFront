@@ -14,13 +14,11 @@ export const SessionSummary: React.FC<SessionSummaryProps> = ({
   sessionCode,
 }) => {
   const handleFinalize = async () => {
-    console.log("TEST1");
     await fetch("https://soilcap.app.n8n.cloud/webhook/finalize-session", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ sessionId: sessionCode }),
     });
-    console.log("TEST2");
   };
 
   return (
