@@ -35,6 +35,7 @@ export const useConfirmationPageLogic = (userId: any) => {
   const [isOrdered, setIsOrdered] = useState<boolean>(false);
   const [initialLoadDone, setInitialLoadDone] = useState<boolean>(false);
   const [userItems, setUserItems] = useState<Item[]>([]);
+  const [userTotal, setUserTotal] = useState<number>(0);
 
   const { sessionCode } = useParams();
   const { user } = useAuth();
@@ -72,11 +73,19 @@ export const useConfirmationPageLogic = (userId: any) => {
         // Récupérer les items de l'utilisateur pour le récapitulatif
         try {
           const itemsResponse = await getItems(sessionCode as string, userId.userId);
-          setUserItems(itemsResponse.data || []);
-          console.log("📋 Items utilisateur récupérés:", itemsResponse.data);
+          const items = itemsResponse.data || [];
+          setUserItems(items);
+          
+          // Calculer le total à partir des items
+          const total = items.reduce((sum: number, item: Item) => sum + item.price_total, 0);
+          setUserTotal(total);
+          
+          console.log("📋 Items utilisateur récupérés:", items);
+          console.log("💰 Total calculé depuis les items:", total);
         } catch (error) {
           console.error("❌ Erreur lors de la récupération des items:", error);
           setUserItems([]);
+          setUserTotal(0);
         }
         
         // Vérifier le statut de commande
@@ -147,6 +156,7 @@ export const useConfirmationPageLogic = (userId: any) => {
     isOrdered,
     initialLoadDone,
     userItems,
+    userTotal, // Total calculé à partir des items
     userEmail: user?.email || "", // Email de l'utilisateur connecté
   };
 }; 

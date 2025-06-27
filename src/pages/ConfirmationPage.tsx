@@ -18,6 +18,7 @@ export const ConfirmationPage = (userId: any) => {
     isOrdered,
     initialLoadDone,
     userItems,
+    userTotal,
   } = useConfirmationPageLogic(userId);
 
   const { user } = useAuth();
@@ -220,7 +221,7 @@ export const ConfirmationPage = (userId: any) => {
                   </div>
 
                   {/* Section paiement */}
-                  {amount > 0 && (
+                  {userTotal > 0 && (
                     <div className="border-t border-cream-300 pt-4">
                       <div className="flex items-center gap-3 mb-4">
                         <div className="w-8 h-8 bg-cream-300 rounded-lg flex items-center justify-center">
@@ -239,14 +240,14 @@ export const ConfirmationPage = (userId: any) => {
                             {isOrdered ? (
                               <>
                                 Scannez ce QR Code avec votre application bancaire pour payer{' '}
-                                <span className="font-bold text-brand-800 text-lg">{amount.toFixed(2)}€</span> à{' '}
+                                <span className="font-bold text-brand-800 text-lg">{userTotal.toFixed(2)}€</span> à{' '}
                                 <span className="font-semibold text-brand-800">{email}</span> sur le compte suivant :{' '}
                                 <span className="font-semibold text-brand-800">{iban}</span>
                               </>
                             ) : (
                               <>
                                 Vous devrez payer{' '}
-                                <span className="font-bold text-brand-800 text-lg">{amount.toFixed(2)}€</span> à{' '}
+                                <span className="font-bold text-brand-800 text-lg">{userTotal.toFixed(2)}€</span> à{' '}
                                 <span className="font-semibold text-brand-800">{email}</span> une fois la commande confirmée.
                               </>
                             )}
@@ -256,7 +257,7 @@ export const ConfirmationPage = (userId: any) => {
                               <SepaQr
                                 iban={iban}
                                 name={email}
-                                amount={amount}
+                                amount={userTotal}
                                 className="mx-auto"
                               />
                             </div>
