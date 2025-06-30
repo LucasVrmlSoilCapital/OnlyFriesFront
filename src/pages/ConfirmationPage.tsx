@@ -19,6 +19,10 @@ export const ConfirmationPage = (userId: any) => {
     initialLoadDone,
     userItems,
     userTotal,
+    hasRefunded,
+    isSubmittingRefund,
+    markAsRefunded,
+    sessionData,
   } = useConfirmationPageLogic(userId);
 
   const { user } = useAuth();
@@ -37,29 +41,40 @@ export const ConfirmationPage = (userId: any) => {
   // Indicateur de polling pour les non-main-users en attente
   const isPolling = initialLoadDone && !isMainUser && !isOrdered;
 
+  // Récupérer le nom de l'utilisateur depuis sessionData ou fallback sur email
+  const getUserName = () => {
+    return sessionData?.user_command?.user_name || user?.email || "Utilisateur";
+  };
+
+  const getUserEmail = () => {
+    return sessionData?.user_command?.user_email || user?.email || "Utilisateur";
+  };
+
   return (
     <div className="bg-cream-300 min-h-screen relative">
-      {/* Bouton retour */}
-      <Link
-        to={`/session/${sessionCode}`}
-        className="absolute top-[10vh] left-8 z-10 inline-flex items-center gap-2 px-4 py-2 text-brand-700 hover:text-brand-800 hover:bg-cream-400/60 rounded-xl transition-all duration-200 backdrop-blur-sm"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
+      {/* Bouton retour - caché si la commande est passée */}
+      {!isOrdered && (
+        <Link
+          to={`/session/${sessionCode}`}
+          className="absolute top-[10vh] left-8 z-10 inline-flex items-center gap-2 px-4 py-2 text-brand-700 hover:text-brand-800 hover:bg-cream-400/60 rounded-xl transition-all duration-200 backdrop-blur-sm"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M15 19l-7-7 7-7"
-          />
-        </svg>
-        Retour au menu
-      </Link>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+          Retour au menu
+        </Link>
+      )}
 
       {/* Contenu principal */}
       <div className="px-4 sm:px-6 lg:px-8 pt-20 pb-8">
@@ -136,7 +151,8 @@ export const ConfirmationPage = (userId: any) => {
                 Récapitulatif de votre commande
               </h2>
               <UserOrderCard
-                userEmail={user?.email || "Utilisateur"}
+                userEmail={getUserEmail()}
+                userName={getUserName()}
                 userId={userId.userId}
                 items={userItems}
               />
@@ -222,47 +238,93 @@ export const ConfirmationPage = (userId: any) => {
 
                   {/* Section paiement */}
                   {userTotal > 0 && (
-                    <div className="border-t border-cream-300 pt-4">
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="w-8 h-8 bg-cream-300 rounded-lg flex items-center justify-center">
-                          <svg className="w-5 h-5 text-warning-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
-                          </svg>
-                        </div>
-                        <h3 className="text-lg font-semibold text-brand-800">
-                          Paiement {isOrdered ? "requis" : "en attente"}
-                        </h3>
-                      </div>
-                      
-                      <div className="bg-cream-100 rounded-lg p-6">
-                        <div className="text-center space-y-4">
-                          <p className="text-brand-700 text-base">
-                            {isOrdered ? (
-                              <>
-                                Scannez ce QR Code avec votre application bancaire pour payer{' '}
-                                <span className="font-bold text-brand-800 text-lg">{userTotal.toFixed(2)}€</span> à{' '}
-                                <span className="font-semibold text-brand-800">{email}</span> sur le compte suivant :{' '}
-                                <span className="font-semibold text-brand-800">{iban}</span>
-                              </>
-                            ) : (
-                              <>
-                                Vous devrez payer{' '}
-                                <span className="font-bold text-brand-800 text-lg">{userTotal.toFixed(2)}€</span> à{' '}
-                                <span className="font-semibold text-brand-800">{email}</span> une fois la commande confirmée.
-                              </>
-                            )}
-                          </p>
-                          {isOrdered && (
-                            <div className="flex justify-center">
-                              <SepaQr
-                                iban={iban}
-                                name={email}
-                                amount={userTotal}
-                                className="mx-auto"
-                              />
-                            </div>
+                    <div className=" border-cream-300">
+                      {/* <div className="flex items-center gap-3 mb-4">
+                        <div className="w-8 h-8 rounded-lg flex items-center justify-center">
+                          {hasRefunded ? (
+                            <svg className="w-5 h-5 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                          ) : (
+                            <svg className="w-5 h-5 text-warning-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+                            </svg>
                           )}
                         </div>
+                        <h3 className="text-lg font-semibold text-brand-800">
+                          {hasRefunded ? "Remboursement effectué !" : (isOrdered ? "Paiement requis" : "Paiement en attente")}
+                        </h3>
+                      </div> */}
+                      
+                      <div className="bg-cream-100 rounded-lg p-6">
+                        {hasRefunded ? (
+                          <div className="text-center space-y-4">
+                            <div className="flex items-center justify-center gap-3">
+                              <div>
+                                <h4 className="text-lg font-semibold text-success-700">Parfait !</h4>
+                                <p className="text-success-700">Vous avez confirmé avoir remboursé {userTotal.toFixed(2)}€</p>
+                              </div>
+                            </div>
+                            <p className="text-brand-700 text-sm">
+                              Merci d'avoir utilisé OnlyFries ! 🍟
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="text-center space-y-4">
+                            <p className="text-brand-700 text-base">
+                              {isOrdered ? (
+                                <>
+                                  Scannez ce QR Code avec votre application bancaire pour payer{' '}
+                                  <span className="font-bold text-brand-800 text-lg">{userTotal.toFixed(2)}€</span> à{' '}
+                                  <span className="font-semibold text-brand-800">{email}</span> sur le compte suivant :{' '}
+                                  <span className="font-semibold text-brand-800">{iban}</span>
+                                </>
+                              ) : (
+                                <>
+                                  Vous devrez payer{' '}
+                                  <span className="font-bold text-brand-800 text-lg">{userTotal.toFixed(2)}€</span> à{' '}
+                                  <span className="font-semibold text-brand-800">{email}</span> une fois la commande confirmée.
+                                </>
+                              )}
+                            </p>
+                            {isOrdered && (
+                              <>
+                                <div className="flex justify-center">
+                                  <SepaQr
+                                    iban={iban}
+                                    name={email}
+                                    amount={userTotal}
+                                    className="mx-auto"
+                                  />
+                                </div>
+                                <div className="pt-2 border-t border-cream-200">
+                                  <button
+                                    onClick={markAsRefunded}
+                                    disabled={isSubmittingRefund}
+                                    className="inline-flex items-center gap-2 px-6 py-3 bg-success-600 hover:bg-success-700 disabled:bg-success-300 text-white font-medium rounded-lg transition-colors duration-200"
+                                  >
+                                    {isSubmittingRefund ? (
+                                      <>
+                                        <LoadingSpinner size="sm" />
+                                        Confirmation en cours...
+                                      </>
+                                    ) : (
+                                      <>
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        J'ai remboursé
+                                      </>
+                                    )}
+                                  </button>
+                                  <p className="text-xs text-neutral-500 mt-2">
+                                    Cliquez uniquement après avoir effectué le paiement
+                                  </p>
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}

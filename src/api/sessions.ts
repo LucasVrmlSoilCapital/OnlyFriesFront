@@ -1,11 +1,26 @@
 import { supabase } from './supabase';
 
 /**
+ * Endpoint unifié pour récupérer toutes les informations d'une session
+ */
+export const getSession = async (sessionCode: string, userId: string) => {
+  const { data, error } = await supabase.functions.invoke("get_session", {
+    body: { code: sessionCode, user_id: userId },
+  });
+
+  if (error) {
+    throw new Error(`Error fetching session: ${error.message}`);
+  }
+
+  return data;
+};
+
+/**
  * Crée une nouvelle session
  */
 export const createSession = async (userId: string, iban: string) => {
   const { data, error } = await supabase.functions.invoke("create_session", {
-    body: { name: "Functions", user_id: userId, iban: iban },
+    body: { user_id: userId, iban: iban },
   });
 
   if (error) {
@@ -19,7 +34,7 @@ export const createSession = async (userId: string, iban: string) => {
  * Rejoint une session existante
  */
 export const joinSession = async (sessionCode: string, userId: string) => {
-  const { data, error } = await supabase.functions.invoke("create_command", {
+  const { data, error } = await supabase.functions.invoke("join_session", {
     body: { code: sessionCode, user_id: userId },
   });
 
@@ -32,6 +47,7 @@ export const joinSession = async (sessionCode: string, userId: string) => {
 
 /**
  * Récupère les informations d'une session
+ * @deprecated Utiliser getSession à la place
  */
 export const getSessionInfos = async (userId: string, sessionCode: string) => {
   const ret = await supabase.functions.invoke("get_session_infos", {
@@ -42,6 +58,7 @@ export const getSessionInfos = async (userId: string, sessionCode: string) => {
 
 /**
  * Récupère les utilisateurs d'une session
+ * @deprecated Utiliser getSession à la place
  */
 export const getSessionUsers = async (sessionCode: string) => {
   const { data, error } = await supabase.functions.invoke("get_session_users", {
@@ -72,6 +89,7 @@ export const setSessionIsOrdered = async (sessionCode: string, userId: string) =
 
 /**
  * Vérifie si une session a été commandée
+ * @deprecated Utiliser getSession à la place
  */
 export const isSessionOrdered = async (sessionCode: string, userId: string) => {
   const { data, error } = await supabase.functions.invoke("is_session_ordered", {

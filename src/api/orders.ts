@@ -2,6 +2,7 @@ import { supabase } from './supabase';
 
 /**
  * Récupère les articles d'un utilisateur dans une session
+ * @deprecated Utiliser getSession depuis api/sessions à la place
  */
 export const getItems = async (sessionCode: string, userId: string) => {
   const { data, error } = await supabase.functions.invoke("get_items", {
@@ -41,6 +42,7 @@ export const setItems = async (
 
 /**
  * Récupère tous les articles de tous les utilisateurs dans une session
+ * @deprecated Utiliser getSession depuis api/sessions à la place
  */
 export const getAllItemsPerUser = async (sessionCode: string, userId: string) => {
   const { data, error } = await supabase.functions.invoke("get_all_items", {
@@ -56,6 +58,7 @@ export const getAllItemsPerUser = async (sessionCode: string, userId: string) =>
 
 /**
  * Récupère toutes les commandes d'une session
+ * @deprecated Utiliser getSession depuis api/sessions à la place
  */
 export const getAllCommands = async (sessionCode: string) => {
   const { data, error } = await supabase.functions.invoke("get_all_commands", {
@@ -70,15 +73,31 @@ export const getAllCommands = async (sessionCode: string) => {
 };
 
 /**
- * Récupère tous les remboursements
+ * Récupère tous les remboursements d'un utilisateur
+ * @deprecated Utiliser getSession depuis api/sessions à la place pour récupérer has_refund
  */
-export const getAllRefunds = async (userId: string, code: string) => {
+export const getAllRefunds = async (userId: string, sessionCode: string) => {
   const { data, error } = await supabase.functions.invoke("get_all_refunds", {
-    body: { name: "Functions", user_id: userId, code: code },
+    body: { code: sessionCode, user_id: userId },
   });
 
   if (error) {
     throw new Error(`Error fetching refunds: ${error.message}`);
+  }
+
+  return data;
+};
+
+/**
+ * Marque qu'un utilisateur a été remboursé
+ */
+export const setRefund = async (sessionCode: string, userId: string) => {
+  const { data, error } = await supabase.functions.invoke("set_has_refund", {
+    body: { code: sessionCode, user_id: userId },
+  });
+
+  if (error) {
+    throw new Error(`Error setting refund: ${error.message}`);
   }
 
   return data;

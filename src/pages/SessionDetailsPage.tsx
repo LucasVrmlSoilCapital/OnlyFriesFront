@@ -16,6 +16,8 @@ export const SessionDetailsPage: React.FC<SessionDetailsPageProps> = ({
     usersWithItems,
     orderedUsers,
     pendingUsers,
+    refundedUsers,
+    notRefundedUsers,
     isLoading,
     error,
     fritzyLink,
@@ -72,6 +74,7 @@ export const SessionDetailsPage: React.FC<SessionDetailsPageProps> = ({
                 <UserOrderCard
                   key={userWithItems.user.id}
                   userEmail={userWithItems.user.email}
+                  userName={userWithItems.user.name}
                   userId={userWithItems.user.id}
                   items={userWithItems.items}
                 />
@@ -95,6 +98,8 @@ export const SessionDetailsPage: React.FC<SessionDetailsPageProps> = ({
             <UserStatusList
               orderedUsers={orderedUsers}
               pendingUsers={pendingUsers}
+              refundedUsers={refundedUsers}
+              notRefundedUsers={notRefundedUsers}
             />
           </div>
         </div>

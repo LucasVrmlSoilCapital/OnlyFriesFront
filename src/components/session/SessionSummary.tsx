@@ -46,9 +46,22 @@ export const SessionSummary: React.FC<SessionSummaryProps> = ({
         </div>
       </div>
 
+      {/* Lien Fritzy - seulement si la commande n'est pas encore confirmée */}
+      {fritzyLink && !orderConfirmed && (
+        <a
+          href={fritzyLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block w-full text-center bg-primary-500 hover:bg-primary-600 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200"
+          onClick={handleFinalize}
+        >
+          🍟 Commander sur Fritzy
+        </a>
+      )}
+
       {/* Section de confirmation pour les main users */}
       {isMainUser && (
-        <div className="mb-6">
+        <div className="mt-6">
           <AnimatePresence mode="wait">
             {!orderConfirmed ? (
               <motion.div
@@ -58,13 +71,10 @@ export const SessionSummary: React.FC<SessionSummaryProps> = ({
                 transition={{ duration: 0.2 }}
                 className="space-y-4"
               >
-                <Button
+                <button
                   onClick={markAsOrdered}
-                  loading={orderingInProgress}
-                  disabled={orderCount === 0}
-                  variant="primary"
-                  size="lg"
-                  className="w-full bg-gradient-to-r from-success-600 to-success-700 hover:from-success-700 hover:to-success-800 shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={orderingInProgress || orderCount === 0}
+                  className="block w-full text-center bg-success-600 hover:bg-success-700 disabled:bg-success-300 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200"
                 >
                   {orderingInProgress ? (
                     <div className="flex items-center justify-center gap-2">
@@ -72,9 +82,9 @@ export const SessionSummary: React.FC<SessionSummaryProps> = ({
                       <span>Confirmation en cours...</span>
                     </div>
                   ) : (
-                    <span className="whitespace-nowrap">Confirmer la commande</span>
+                    <span className="whitespace-nowrap">Confirmer que la commande est passée</span>
                   )}
-                </Button>
+                </button>
               </motion.div>
             ) : (
               <motion.div
@@ -104,19 +114,6 @@ export const SessionSummary: React.FC<SessionSummaryProps> = ({
             )}
           </AnimatePresence>
         </div>
-      )}
-
-      {/* Lien Fritzy - seulement si la commande n'est pas encore confirmée */}
-      {fritzyLink && !orderConfirmed && (
-        <a
-          href={fritzyLink}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="block w-full text-center bg-primary-500 hover:bg-primary-600 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200"
-          onClick={handleFinalize}
-        >
-          🍟 Commander sur Fritzy
-        </a>
       )}
     </div>
   );

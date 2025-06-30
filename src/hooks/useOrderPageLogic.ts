@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { MenuItemT, SelectedOption } from "../types/menu";
-import { getItems } from "../api/orders";
+import { getSession } from "../api/sessions";
 import { useParams } from "react-router-dom";
 import { useCart, useMenu, CartItem } from "../hooks";
 
@@ -41,10 +41,13 @@ export const useOrderPageLogic = (user: any) => {
 
       try {
         setIsLoading(true);
-        const response = await getItems(sessionCode, user.id);
-        const items: FetchedItem[] = response.data;
+        const response = await getSession(sessionCode, user.id);
+        const session = response.session;
+        
+        // Récupérer les items de l'utilisateur actuel depuis user_command
+        const items: FetchedItem[] = session.user_command?.items || [];
 
-        if (items) {
+        if (items && items.length > 0) {
           const cartItems: CartItem[] = [];
           
           items.forEach((item) => {

@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import { getSessionInfos, isSessionOrdered } from "../api/sessions";
-import { getItems } from "../api/orders";
+import { getSession } from "../api/sessions";
+import { setRefund } from "../api/orders";
 import { useAuth } from "../contexts/AuthContext";
 
 interface Item {
@@ -26,6 +26,28 @@ interface ItemExtra {
   price_total: number;
 }
 
+interface SessionData {
+  code: string;
+  is_ordered: boolean;
+  owner_name: string;
+  owner_iban: string;
+  owner_email: string;
+  user_command: {
+    user_id: string;
+    user_email: string;
+    user_name: string;
+    has_refund: boolean;
+    items: Item[];
+  };
+  users_command: Array<{
+    user_id: string;
+    user_email: string;
+    user_name: string;
+    has_refund: boolean;
+    items: Item[];
+  }>;
+}
+
 export const useConfirmationPageLogic = (userId: any) => {
   const [isMainUser, setIsMainUser] = useState<boolean>(false);
   const [iban, setIban] = useState<string>("");
@@ -36,20 +58,87 @@ export const useConfirmationPageLogic = (userId: any) => {
   const [initialLoadDone, setInitialLoadDone] = useState<boolean>(false);
   const [userItems, setUserItems] = useState<Item[]>([]);
   const [userTotal, setUserTotal] = useState<number>(0);
+  const [hasRefunded, setHasRefunded] = useState<boolean>(false);
+  const [isSubmittingRefund, setIsSubmittingRefund] = useState<boolean>(false);
+  const [sessionData, setSessionData] = useState<SessionData | null>(null);
 
   const { sessionCode } = useParams();
   const { user } = useAuth();
 
-  const checkOrderStatus = useCallback(async () => {
-    if (!sessionCode || !userId?.userId) return;
+  const markAsRefunded = useCallback(async () => {
+    if (!sessionCode || !userId?.userId || isSubmittingRefund) return;
     
     try {
-      console.log("🔍 Vérification du statut de commande...");
-      const response = await isSessionOrdered(sessionCode, userId.userId);
-      console.log("📊 Réponse statut de commande:", response);
-      const ordered = response.data || false;
+      setIsSubmittingRefund(true);
+      await setRefund(sessionCode, userId.userId);
+      setHasRefunded(true);
+    } catch (error) {
+      console.error("❌ Erreur lors du marquage du remboursement:", error);
+    } finally {
+      setIsSubmittingRefund(false);
+    }
+  }, [sessionCode, userId?.userId, isSubmittingRefund]);
+
+  useEffect(() => {
+    const loadSessionData = async () => {
+      try {
+        setIsLoading(true);
+        
+        // Récupérer toutes les données de session en une seule fois
+        const response = await getSession(sessionCode as string, userId.userId);
+        const session: SessionData = response.session;
+        setSessionData(session);
+
+        // Déterminer si l'utilisateur est le main user
+        const isUserMainUser = session.users_command && session.users_command.length > 0;
+        setIsMainUser(isUserMainUser);
+        
+        // Récupérer les informations du propriétaire
+        setIban(session.owner_iban);
+        setEmail(session.owner_email);
+        
+        // Récupérer le statut de commande
+        setIsOrdered(session.is_ordered);
+        
+        // Récupérer les items de l'utilisateur et son statut de remboursement
+        if (session.user_command) {
+          const items = session.user_command.items || [];
+          setUserItems(items);
+          setHasRefunded(session.user_command.has_refund);
+          
+          // Calculer le total à partir des items
+          const total = items.reduce((sum: number, item: Item) => sum + item.price_total, 0);
+          setUserTotal(total);
+          setAmount(total); // Utiliser le total calculé comme montant à payer
+        } else {
+          setUserItems([]);
+          setUserTotal(0);
+          setAmount(0);
+          setHasRefunded(false);
+        }
+
+        setInitialLoadDone(true);
+      } catch (error) {
+        console.error("❌ Erreur lors du chargement des données:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (sessionCode && userId?.userId) {
+      loadSessionData();
+    }
+  }, [userId?.userId, sessionCode]);
+
+  // Fonction pour vérifier le statut de commande (pour non-main-users)
+  const checkOrderStatus = useCallback(async () => {
+    if (!sessionCode || !userId?.userId) return false;
+    
+    try {
+      const response = await getSession(sessionCode, userId.userId);
+      const session: SessionData = response.session;
+      const ordered = session.is_ordered || false;
       setIsOrdered(ordered);
-      console.log(`✅ isOrdered mis à jour: ${ordered}`);
       return ordered;
     } catch (error) {
       console.error("❌ Erreur lors de la vérification du statut de commande:", error);
@@ -57,96 +146,26 @@ export const useConfirmationPageLogic = (userId: any) => {
     }
   }, [sessionCode, userId?.userId]);
 
-  useEffect(() => {
-    const callGetIsMainUser = async () => {
-      try {
-        setIsLoading(true);
-        const data = await getSessionInfos(
-          userId.userId,
-          sessionCode as string
-        );
-        setIsMainUser(data.data.owner_id === userId.userId);
-        setIban(data.data.iban);
-        setEmail(data.data.owner_email);
-        setAmount(data.data.price_to_pay);
-        
-        // Récupérer les items de l'utilisateur pour le récapitulatif
-        try {
-          const itemsResponse = await getItems(sessionCode as string, userId.userId);
-          const items = itemsResponse.data || [];
-          setUserItems(items);
-          
-          // Calculer le total à partir des items
-          const total = items.reduce((sum: number, item: Item) => sum + item.price_total, 0);
-          setUserTotal(total);
-          
-          console.log("📋 Items utilisateur récupérés:", items);
-          console.log("💰 Total calculé depuis les items:", total);
-        } catch (error) {
-          console.error("❌ Erreur lors de la récupération des items:", error);
-          setUserItems([]);
-          setUserTotal(0);
-        }
-        
-        // Vérifier le statut de commande
-        await checkOrderStatus();
-        setInitialLoadDone(true);
-      } catch (error) {
-        console.error("Erreur lors du chargement des données:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    callGetIsMainUser();
-  }, [userId.userId, sessionCode, checkOrderStatus]);
-
   // Polling pour les non-main-users quand la commande n'est pas encore passée
   useEffect(() => {
-    console.log("🔄 Configuration du polling ConfirmationPage:", { 
-      initialLoadDone, 
-      isMainUser, 
-      isOrdered, 
-      sessionCode: !!sessionCode, 
-      userId: !!userId?.userId, 
-      isLoading 
-    });
+    // Condition pour démarrer le polling pour non-main-users seulement (s'arrête quand ordered)
+    const shouldStartPollingForUser = initialLoadDone && !isMainUser && !isOrdered && sessionCode && userId?.userId && !isLoading;
 
-    // Condition pour démarrer le polling
-    const shouldStartPolling = initialLoadDone && !isMainUser && !isOrdered && sessionCode && userId?.userId && !isLoading;
-
-    if (shouldStartPolling) {
-      console.log("🚀 DÉMARRAGE DU POLLING toutes les 5 secondes pour non-main-user dans ConfirmationPage");
-      
+    if (shouldStartPollingForUser) {
       const interval = setInterval(async () => {
-        console.log("⏰ Polling en cours...", new Date().toLocaleTimeString());
         const ordered = await checkOrderStatus();
         if (ordered) {
-          console.log("🎉 Commande détectée comme confirmée, le polling va s'arrêter automatiquement");
-          // Le polling s'arrêtera automatiquement car isOrdered va changer et déclencher un nouveau useEffect
+          // Le polling s'arrêtera automatiquement car isOrdered va changer
         }
       }, 5000); // 5 secondes
       
       return () => {
-        console.log("🛑 Arrêt du polling ConfirmationPage");
         clearInterval(interval);
       };
-    } else {
-      if (isOrdered) {
-        console.log("✅ Polling arrêté car la commande est confirmée");
-      } else {
-        console.log("❌ Polling non démarré dans ConfirmationPage:", {
-          raison: !initialLoadDone ? "initialLoadDone=false" : 
-                  isMainUser ? "isMainUser=true" : 
-                  !sessionCode ? "pas de sessionCode" : 
-                  !userId?.userId ? "pas de userId" : 
-                  isLoading ? "isLoading=true" : "unknown"
-        });
-      }
     }
   }, [initialLoadDone, isMainUser, isOrdered, sessionCode, userId?.userId, isLoading, checkOrderStatus]);
 
   return {
-    // State
     isMainUser,
     iban,
     email,
@@ -156,7 +175,10 @@ export const useConfirmationPageLogic = (userId: any) => {
     isOrdered,
     initialLoadDone,
     userItems,
-    userTotal, // Total calculé à partir des items
-    userEmail: user?.email || "", // Email de l'utilisateur connecté
+    userTotal,
+    hasRefunded,
+    isSubmittingRefund,
+    markAsRefunded,
+    sessionData,
   };
 }; 

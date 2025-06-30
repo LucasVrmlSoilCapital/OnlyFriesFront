@@ -31,15 +31,21 @@ interface ItemGroup {
 
 interface UserOrderCardProps {
   userEmail: string;
+  userName: string;
   userId: string;
   items: Item[];
 }
 
 export const UserOrderCard: React.FC<UserOrderCardProps> = ({
   userEmail,
+  userName,
   userId,
   items
 }) => {
+  const getUserDisplayName = () => {
+    return userName || userEmail;
+  };
+
   // Calculer le total d'un utilisateur
   const getUserTotal = (items: Item[]) => {
     return items.reduce((total, item) => total + item.price_total, 0);
@@ -73,7 +79,7 @@ export const UserOrderCard: React.FC<UserOrderCardProps> = ({
       {/* En-tête utilisateur */}
       <div className="bg-warm-500 text-white p-4">
         <div className="flex justify-between items-center">
-          <h3 className="text-lg font-semibold">{userEmail}</h3>
+          <h3 className="text-lg font-semibold">{getUserDisplayName()}</h3>
           <span className="bg-white text-warm-700 px-3 py-1 rounded-full font-bold">
             {userTotal.toFixed(2)}€
           </span>

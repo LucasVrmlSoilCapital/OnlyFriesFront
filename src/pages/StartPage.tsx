@@ -8,6 +8,7 @@ export const StartPage = (userId: any) => {
     setSessionCode,
     iban,
     setIban,
+    ibanError,
     isCreatingSession,
     isJoiningSession,
     handleCreateSession,
@@ -49,10 +50,11 @@ export const StartPage = (userId: any) => {
             <div className="space-y-6">
               <Input
                 label="IBAN"
-                placeholder="Votre IBAN pour recevoir les paiements"
+                placeholder="Votre IBAN belge (BE) ou français (FR)"
                 value={iban}
                 onChange={(e) => setIban(e.target.value)}
                 inputSize="lg"
+                error={ibanError}
               />
               
               <Button 
@@ -61,6 +63,7 @@ export const StartPage = (userId: any) => {
                 size="xl"
                 className="w-full"
                 variant="primary"
+                disabled={!!ibanError || !iban.trim()}
               >
                 {isCreatingSession ? "Création en cours..." : "Créer la session"}
               </Button>

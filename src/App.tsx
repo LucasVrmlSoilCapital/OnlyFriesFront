@@ -1,13 +1,14 @@
 import React from "react";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { ProtectedRoute, NavBar } from "./components/layout";
+import { SessionRouter } from "./components/session";
 import "./App.css";
 import { Route, Routes } from "react-router-dom";
 import { 
   StartPage, 
   AuthPage, 
-  OrderPage, 
   ConfirmationPage, 
+  TooLatePage,
   NotFoundPage 
 } from "./pages";
 
@@ -53,10 +54,18 @@ const AppContent: React.FC = () => {
             }
           />
           <Route
+            path="/session/:sessionCode/too-late"
+            element={
+              <ProtectedRoute>
+                <TooLatePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/session/:sessionCode"
             element={
               <ProtectedRoute>
-                <OrderPage user={user} />
+                <SessionRouter user={user} />
               </ProtectedRoute>
             }
           />
